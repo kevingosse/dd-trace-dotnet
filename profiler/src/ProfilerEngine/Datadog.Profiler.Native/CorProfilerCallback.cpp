@@ -21,6 +21,7 @@
 #include "Configuration.h"
 #include "EnvironmentVariables.h"
 #include "FrameStore.h"
+#include "HResultConverter.h"
 #include "IMetricsSender.h"
 #include "IMetricsSenderFactory.h"
 #include "LibddprofExporter.h"
@@ -125,6 +126,8 @@ bool CorProfilerCallback::InitializeServices()
 
     _pStackSnapshotsBufferManager = RegisterService<StackSnapshotsBufferManager>(_pThreadsCpuManager, _pSymbolsResolver);
 
+    _pExceptionsManager = std::make_unique<ExceptionsManager>(_pCorProfilerInfo, _pManagedThreadList, _pFrameStore.get());
+    
     auto* pRuntimeIdStore = RegisterService<RuntimeIdStore>();
     auto* pWallTimeProvider = RegisterService<WallTimeProvider>(_pConfiguration.get(), _pFrameStore.get(), _pAppDomainStore.get(), pRuntimeIdStore);
     CpuTimeProvider* pCpuTimeProvider = nullptr;
@@ -625,9 +628,7 @@ HRESULT STDMETHODCALLTYPE CorProfilerCallback::Initialize(IUnknown* corProfilerI
 
     // Configure which profiler callbacks we want to receive by setting the event mask:
     const DWORD eventMask =
-        shared::Loader::GetSingletonInstance()->GetLoaderProfilerEventMask() |
-        COR_PRF_MONITOR_THREADS |
-        COR_PRF_ENABLE_STACK_SNAPSHOT;
+        shared::Loader::GetSingletonInstance()->GetLoaderProfilerEventMask() | COR_PRF_MONITOR_THREADS | COR_PRF_ENABLE_STACK_SNAPSHOT | COR_PRF_MONITOR_EXCEPTIONS;
 
     hr = _pCorProfilerInfo->SetEventMask(eventMask);
     if (FAILED(hr))
@@ -710,6 +711,8 @@ HRESULT STDMETHODCALLTYPE CorProfilerCallback::ModuleLoadFinished(ModuleID modul
         return S_OK;
     }
 
+    _pExceptionsManager->OnModuleLoaded(moduleId);
+    
     if (_pConfiguration->IsFFLibddprofEnabled())
     {
         return S_OK;
@@ -1002,6 +1005,7 @@ HRESULT STDMETHODCALLTYPE CorProfilerCallback::RootReferences(ULONG cRootRefs, O
 
 HRESULT STDMETHODCALLTYPE CorProfilerCallback::ExceptionThrown(ObjectID thrownObjectId)
 {
+    _pExceptionsManager->OnExceptionThrown(thrownObjectId);
     return S_OK;
 }
 
