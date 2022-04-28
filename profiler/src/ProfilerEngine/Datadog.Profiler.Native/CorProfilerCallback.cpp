@@ -43,6 +43,7 @@
 #include "SamplesAggregator.h"
 #include "FrameStore.h"
 #include "AppDomainStore.h"
+#include "ExceptionsProvider.h"
 
 #include "shared/src/native-src/environment_variables.h"
 #include "shared/src/native-src/loader.h"
@@ -126,9 +127,16 @@ bool CorProfilerCallback::InitializeServices()
 
     _pStackSnapshotsBufferManager = RegisterService<StackSnapshotsBufferManager>(_pThreadsCpuManager, _pSymbolsResolver);
 
-    _pExceptionsManager = std::make_unique<ExceptionsManager>(_pCorProfilerInfo, _pManagedThreadList, _pFrameStore.get());
-    
     auto* pRuntimeIdStore = RegisterService<RuntimeIdStore>();
+
+    _pExceptionsProvider = RegisterService<ExceptionsProvider>(
+        _pCorProfilerInfo,
+        _pManagedThreadList,
+        _pFrameStore.get(),
+        _pConfiguration.get(),
+        _pAppDomainStore.get(),
+        pRuntimeIdStore);
+    
     auto* pWallTimeProvider = RegisterService<WallTimeProvider>(_pConfiguration.get(), _pFrameStore.get(), _pAppDomainStore.get(), pRuntimeIdStore);
     CpuTimeProvider* pCpuTimeProvider = nullptr;
     if (_pConfiguration->IsFFLibddprofEnabled())
@@ -162,10 +170,13 @@ bool CorProfilerCallback::InitializeServices()
         _pExporter = std::make_unique<LibddprofExporter>(_pConfiguration.get(), _pApplicationStore);
         auto* pSamplesAggregrator = RegisterService<SamplesAggregator>(_pConfiguration.get(), _pExporter.get(), _metricsSender.get());
         pSamplesAggregrator->Register(pWallTimeProvider);
+
         if (_pConfiguration->IsCpuProfilingEnabled())
         {
             pSamplesAggregrator->Register(pCpuTimeProvider);
         }
+
+        pSamplesAggregrator->Register(_pExceptionsProvider);
     }
 
     auto started = StartServices();
@@ -711,7 +722,7 @@ HRESULT STDMETHODCALLTYPE CorProfilerCallback::ModuleLoadFinished(ModuleID modul
         return S_OK;
     }
 
-    _pExceptionsManager->OnModuleLoaded(moduleId);
+    _pExceptionsProvider->OnModuleLoaded(moduleId);
     
     if (_pConfiguration->IsFFLibddprofEnabled())
     {
@@ -1005,7 +1016,7 @@ HRESULT STDMETHODCALLTYPE CorProfilerCallback::RootReferences(ULONG cRootRefs, O
 
 HRESULT STDMETHODCALLTYPE CorProfilerCallback::ExceptionThrown(ObjectID thrownObjectId)
 {
-    _pExceptionsManager->OnExceptionThrown(thrownObjectId);
+    _pExceptionsProvider->OnExceptionThrown(thrownObjectId);
     return S_OK;
 }
 

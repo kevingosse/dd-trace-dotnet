@@ -9,7 +9,7 @@
 // end
 
 #include "ApplicationStore.h"
-#include "ExceptionsManager.h"
+#include "ExceptionsProvider.h"
 #include "IAppDomainStore.h"
 #include "IClrLifetime.h"
 #include "IConfiguration.h"
@@ -199,14 +199,14 @@ private :
     IManagedThreadList* _pManagedThreadList = nullptr;
     ISymbolsResolver* _pSymbolsResolver = nullptr;
     IApplicationStore* _pApplicationStore = nullptr;
+    ExceptionsProvider* _pExceptionsProvider = nullptr;
 
     std::vector<std::unique_ptr<IService>> _services;
 
     std::unique_ptr<IExporter> _pExporter = nullptr;
     std::unique_ptr<IConfiguration> _pConfiguration = nullptr;
     std::unique_ptr<IAppDomainStore> _pAppDomainStore = nullptr;
-    std::unique_ptr<IFrameStore> _pFrameStore = nullptr;
-    std::unique_ptr<ExceptionsManager> _pExceptionsManager = nullptr;
+    std::unique_ptr<IFrameStore> _pFrameStore = nullptr;    
 
 private:
     static void ConfigureDebugLog();

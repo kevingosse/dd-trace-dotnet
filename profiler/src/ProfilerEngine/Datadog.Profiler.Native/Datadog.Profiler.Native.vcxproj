@@ -245,7 +245,7 @@
     <ClInclude Include="DogFood.hpp" />
     <ClInclude Include="DogstatsdService.h" />
     <ClInclude Include="EnvironmentVariables.h" />
-    <ClInclude Include="ExceptionsManager.h" />
+    <ClInclude Include="ExceptionsProvider.h" />
     <ClInclude Include="FfiHelper.h" />
     <ClInclude Include="FrameStore.h" />
     <ClInclude Include="IAppDomainStore.h" />
@@ -274,6 +274,7 @@
     <ClInclude Include="LibddprofExporter.h" />
     <ClInclude Include="ProfilerEngineStatus.h" />
     <ClInclude Include="RawCpuSample.h" />
+    <ClInclude Include="RawExceptionSample.h" />
     <ClInclude Include="RawSample.h" />
     <ClInclude Include="RefCountingObject.h" />
     <ClInclude Include="ResolvedSymbolsCache.h" />
@@ -314,7 +315,7 @@
     <ClCompile Include="CorProfilerCallbackFactory.cpp" />
     <ClCompile Include="CpuTimeProvider.cpp" />
     <ClCompile Include="DogstatsdService.cpp" />
-    <ClCompile Include="ExceptionsManager.cpp" />
+    <ClCompile Include="ExceptionsProvider.cpp" />
     <ClCompile Include="FfiHelper.cpp" />
     <ClCompile Include="FrameStore.cpp" />
     <ClCompile Include="HResultConverter.cpp" />
@@ -325,6 +326,7 @@
     <ClCompile Include="PInvoke.cpp" />
     <ClCompile Include="LibddprofExporter.cpp" />
     <ClCompile Include="ProfilerEngineStatus.cpp" />
+    <ClCompile Include="RawExceptionSample.cpp" />
     <ClCompile Include="RawSample.cpp" />
     <ClCompile Include="RefCountingObject.cpp" />
     <ClCompile Include="ResolvedSymbolsCache.cpp" />
