@@ -1,4 +1,4 @@
-﻿// <copyright file="ExceptionGenerator.cs" company="Datadog">
+// <copyright file="ExceptionGenerator.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2022 Datadog, Inc.
 // </copyright>
@@ -17,6 +17,7 @@ namespace Datadog.Demos.ExceptionGenerator
         private static readonly TimeSpan StatsPeriodDuration = TimeSpan.FromSeconds(5);
         private readonly Thread _thread;
         private volatile bool _isStopped;
+        private static int _count;
 
         public ExceptionGenerator()
         {
@@ -71,7 +72,7 @@ namespace Datadog.Demos.ExceptionGenerator
             }
             else
             {
-                throw new Exception("Test Exception");
+                throw new Exception($"Test Exception {Interlocked.Increment(ref _count)}");
             }
         }
 
@@ -97,7 +98,7 @@ namespace Datadog.Demos.ExceptionGenerator
         private void MainLoop()
         {
             DateTimeOffset statsPeriodStartTime, startTime;
-            statsPeriodStartTime = startTime = DateTimeOffset.Now;
+            statsPeriodStartTime = startTime = DateTimeOffset.UtcNow;
 
             int totalInvocations = 0;
             int statsPeriodInvocations = 0;
@@ -126,7 +127,7 @@ namespace Datadog.Demos.ExceptionGenerator
 #pragma warning restore CS0162 // Unreachable code detected
                 }
 
-                DateTimeOffset invokeEnd = DateTimeOffset.Now;
+                DateTimeOffset invokeEnd = DateTimeOffset.UtcNow;
 
                 statsPeriodInvocations++;
                 totalInvocations++;
@@ -152,9 +153,14 @@ namespace Datadog.Demos.ExceptionGenerator
                     statsPeriodExceptions = 0;
                     statsPeriodStartTime = invokeEnd;
                 }
-
-                Thread.Yield();
             }
+
+            var full = DateTimeOffset.UtcNow - startTime;
+            Console.WriteLine("Summary:");
+            Console.WriteLine($"  Invocations:             {totalInvocations}.");
+            Console.WriteLine($"  Exceptions:              {totalExceptions}.");
+            Console.WriteLine($"  Time:                    {full}.");
+            Console.WriteLine($"  Mean invocations/sec:    {totalInvocations / (full).TotalSeconds}.");
         }
     }
 }
