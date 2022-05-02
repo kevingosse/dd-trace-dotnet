@@ -21,7 +21,6 @@
 #include "Configuration.h"
 #include "EnvironmentVariables.h"
 #include "FrameStore.h"
-#include "HResultConverter.h"
 #include "IMetricsSender.h"
 #include "IMetricsSenderFactory.h"
 #include "LibddprofExporter.h"
