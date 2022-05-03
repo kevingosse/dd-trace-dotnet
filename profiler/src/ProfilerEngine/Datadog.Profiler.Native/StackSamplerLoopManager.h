@@ -212,7 +212,7 @@ private:
     ICollector<RawWallTimeSample>* _pWallTimeCollector = nullptr;
     ICollector<RawCpuSample>* _pCpuTimeCollector = nullptr;
 
-    StackFramesCollectorBase* _pStackFramesCollector;
+    std::unique_ptr<StackFramesCollectorBase> _pStackFramesCollector;
     StackSamplerLoop* _pStackSamplerLoop;
     std::uint8_t _deadlockInterventionInProgress;
 
