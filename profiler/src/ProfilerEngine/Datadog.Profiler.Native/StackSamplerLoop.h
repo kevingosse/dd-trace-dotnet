@@ -56,7 +56,7 @@ public:
 
     void Join();
     void RequestShutdown();
-
+    
 private:
     ICorProfilerInfo4* _pCorProfilerInfo;
     StackFramesCollectorBase* _pStackFramesCollector;
@@ -87,7 +87,6 @@ private:
     void CollectOneThreadStackSample(ManagedThreadInfo* pThreadInfo);
     void LogEncounteredStackSnapshotResultStatistics(std::int64_t thisSampleTimestampNanosecs, bool useStdOutInsteadOfLog = false);
     void DetermineSampledStackFrameCodeKinds(StackSnapshotResultBuffer* _pStackSnapshotResult);
-    void DetermineAppDomain(ThreadID threadId, StackSnapshotResultBuffer* const pStackSnapshotResult);
     std::int64_t ComputeWallTime(std::int64_t thisSampleTimestampNanosecs, std::int64_t prevSampleTimestampNanosecs);
     void UpdateSnapshotInfos(StackSnapshotResultBuffer* const pStackSnapshotResult, std::int64_t representedDurationNanosecs, time_t currentUnixTimestamp);
     void UpdateStatistics(HRESULT hrCollectStack, std::uint16_t countCollectedStackFrames);
