@@ -122,11 +122,16 @@ inline bool IsInstrumentedAssemblyGeneratorEnabled()
         if (isInstrumentedAssemblyGeneratorEnabled == WStr("1") ||
             isInstrumentedAssemblyGeneratorEnabled == WStr("true"))
         {
+#if _WIN32
             if (const auto path = GetInstrumentedAssemblyGeneratorCurrentProcessFolder(); !path.empty())
             {
-                Log::Info("InstrumentedAssemblyGenerator output folder is: ", path);
+                Log::Info("Instrumentation Verification log is enabled. Output folder is: ", path);
                 return true;
             }
+#else 
+            Log::Warn("Instrumentation Verification is currently only supported on Windows and will be disabled.");
+#endif
+
         }
     }
     catch (...)
