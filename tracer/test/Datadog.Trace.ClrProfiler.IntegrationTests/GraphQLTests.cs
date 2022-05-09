@@ -92,7 +92,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         protected async Task RunSubmitsTraces(string packageVersion = "")
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             using var telemetry = this.ConfigureTelemetry();
             int? aspNetCorePort = null;
 

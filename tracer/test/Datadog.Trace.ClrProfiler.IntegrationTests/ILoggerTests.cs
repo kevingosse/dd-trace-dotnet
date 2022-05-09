@@ -60,7 +60,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var expectedCorrelatedSpanCount = 4;
 #endif
 
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             using var logsIntake = new MockLogsIntake();
             if (enableLogShipping)
             {
@@ -84,7 +84,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("SupportsInstrumentationVerification", "True")]
         public void DirectlyShipsLogs()
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             var hostName = "integration_ilogger_tests";
             using var logsIntake = new MockLogsIntake();
 

@@ -14,8 +14,6 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.InstrumentedAssemblyGenerator;
-using Datadog.InstrumentedAssemblyVerification;
 using Datadog.Trace.Configuration;
 using Xunit;
 using Xunit.Abstractions;
@@ -443,60 +441,38 @@ namespace Datadog.Trace.TestHelpers
             SetEnvironmentVariable(Configuration.ConfigurationKeys.AppSec.Enabled, security ? "true" : "false");
         }
 
-        protected void SetInstrumentationVerification(bool verificationEnabled)
+        protected void SetInstrumentationVerification()
         {
+            bool verificationEnabled = ShouldUseInstrumentationVerification();
             SetEnvironmentVariable(Configuration.ConfigurationKeys.InstrumentationVerificationEnabled, verificationEnabled ? "1" : "0");
         }
 
         protected void VerifyInstrumentation(Process process)
         {
-            string GetInstrumentationLogsFolder()
-            {
-                var processStartTime = string.Empty;
-                if (EnvironmentTools.IsWindows())
-                {
-                    processStartTime = process.StartTime.ToUniversalTime().ToString("dd-MM-yyyy_HH-mm-ss");
-                }
-
-                var processExecutableFileName = Path.GetFileNameWithoutExtension(process.StartInfo.FileName);
-                var logsFolder = EnvironmentHelper.LogDirectory;
-                Assert.NotNull(logsFolder);
-                var instrumentationLogsFolder = Path.Combine(logsFolder, InstrumentedAssemblyGeneratorConsts.InstrumentedAssemblyGeneratorLogsFolder, $"{processExecutableFileName}_{process.Id}_{processStartTime}");
-
-                if (!Directory.Exists(instrumentationLogsFolder))
-                {
-                    throw new Exception($"Unable to find instrumentation verification directory at {instrumentationLogsFolder}");
-                }
-
-                return instrumentationLogsFolder;
-            }
-
-            if (EnvironmentHelper.IsRunningInAzureDevOps() && !EnvironmentHelper.IsScheduledBuild())
+            if (!ShouldUseInstrumentationVerification())
             {
                 return;
             }
 
-            var instrumentedLogsPath = GetInstrumentationLogsFolder();
+            var logDirectory = EnvironmentHelper.LogDirectory;
+            InstrumentationVerification.VerifyInstrumentation(process, logDirectory);
+        }
 
-            var generatorArgs = new AssemblyGeneratorArgs(instrumentedLogsPath);
-            var generatedModules = InstrumentedAssemblyGeneration.Generate(generatorArgs);
-
-            var results = new List<VerificationOutcome>();
-            foreach (var (modulePath, methods) in generatedModules)
+        protected bool ShouldUseInstrumentationVerification()
+        {
+            if (!EnvironmentTools.IsWindows())
             {
-                var moduleName = Path.GetFileName(modulePath);
-                var originalModulePath = Path.Combine(instrumentedLogsPath, InstrumentedAssemblyGeneratorConsts.OriginalModulesFolderName, moduleName);
-                var result = new VerificationsRunner(
-                    modulePath,
-                    originalModulePath,
-                    methods).
-                    Run();
-                results.Add(result);
+                // Instrumentation Verification is currently only supported only on Windows
+                return false;
             }
 
-            Assert.True(
-                results.TrueForAll(r => r.IsValid),
-                "Instrumentation verification failed:\r\n" + string.Join(Environment.NewLine, results.Where(r => !r.IsValid).Select(r => r.FailureReason)));
+            if (EnvironmentHelper.IsRunningInAzureDevOps() && EnvironmentHelper.IsScheduledBuild())
+            {
+                // Instrumentation Verification should only run on scheduled builds
+                return true;
+            }
+
+            return false;
         }
 
         protected void EnableDirectLogSubmission(int intakePort, string integrationName, string host = "integration_tests")

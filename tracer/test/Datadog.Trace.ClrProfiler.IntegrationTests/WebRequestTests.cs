@@ -30,7 +30,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("SupportsInstrumentationVerification", "True")]
         public void SubmitsTraces()
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             var expectedSpanCount = 76;
 
             const string expectedOperationName = "http.request";
@@ -73,7 +73,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public void TracingDisabled_DoesNotSubmitsTraces()
         {
             const string expectedOperationName = "http.request";
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
 
             int httpPort = TcpPortProvider.GetOpenPort();
 

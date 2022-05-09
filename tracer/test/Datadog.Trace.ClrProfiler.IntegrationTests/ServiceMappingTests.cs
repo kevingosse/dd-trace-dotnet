@@ -27,7 +27,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             var expectedSpanCount = 76;
 
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             const string expectedOperationName = "http.request";
             const string expectedServiceName = "my-custom-client";
 

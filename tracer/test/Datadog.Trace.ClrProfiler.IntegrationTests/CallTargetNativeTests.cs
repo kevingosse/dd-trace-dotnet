@@ -34,7 +34,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("SupportsInstrumentationVerification", "True")]
         public void MethodArgumentsInstrumentation(int numberOfArguments, bool fastPath)
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var processResult = RunSampleAndWaitForExit(agent, arguments: numberOfArguments.ToString()))
             {
@@ -86,7 +86,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("SupportsInstrumentationVerification", "True")]
         public void MethodRefArguments()
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var processResult = RunSampleAndWaitForExit(agent, arguments: "withref"))
             {
@@ -117,7 +117,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("SupportsInstrumentationVerification", "True")]
         public void MethodOutArguments()
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var processResult = RunSampleAndWaitForExit(agent, arguments: "without"))
             {
@@ -147,7 +147,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("SupportsInstrumentationVerification", "True")]
         public void MethodAbstract()
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var processResult = RunSampleAndWaitForExit(agent, arguments: "abstract"))
             {

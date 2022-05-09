@@ -69,7 +69,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("SupportsInstrumentationVerification", "True")]
         public void InjectsLogsWhenEnabled(string packageVersion, bool enableLogShipping)
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             SetEnvironmentVariable("DD_LOGS_INJECTION", "true");
             using var logsIntake = new MockLogsIntake();
             if (enableLogShipping)
@@ -111,7 +111,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public void DoesNotInjectLogsWhenDisabled(string packageVersion, bool enableLogShipping)
         {
             SetEnvironmentVariable("DD_LOGS_INJECTION", "false");
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             using var logsIntake = new MockLogsIntake();
             if (enableLogShipping)
             {
@@ -154,7 +154,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var hostName = "integration_log4net_tests";
             using var logsIntake = new MockLogsIntake();
 
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             SetEnvironmentVariable("DD_LOGS_INJECTION", "true");
             EnableDirectLogSubmission(logsIntake.Port, nameof(IntegrationId.Log4Net), hostName);
 

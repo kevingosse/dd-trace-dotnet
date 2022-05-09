@@ -63,7 +63,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var normalizedServiceName = "samples._runtimemetrics";
             SetEnvironmentVariable("DD_SERVICE", inputServiceName);
             SetEnvironmentVariable("DD_RUNTIME_METRICS_ENABLED", "1");
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
             using var processResult = RunSampleAndWaitForExit(agent);
             var requests = agent.StatsdRequests;

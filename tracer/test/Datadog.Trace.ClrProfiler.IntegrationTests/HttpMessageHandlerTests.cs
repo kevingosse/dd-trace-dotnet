@@ -47,7 +47,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(IntegrationConfig))]
         public void HttpClient_SubmitsTraces(InstrumentationOptions instrumentation, bool enableSocketsHandler)
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             ConfigureInstrumentation(instrumentation, enableSocketsHandler);
 
             var expectedAsyncCount = CalculateExpectedAsyncSpans(instrumentation);
@@ -106,7 +106,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(IntegrationConfig))]
         public void TracingDisabled_DoesNotSubmitsTraces(InstrumentationOptions instrumentation, bool enableSocketsHandler)
         {
-            SetInstrumentationVerification(true);
+            SetInstrumentationVerification();
             ConfigureInstrumentation(instrumentation, enableSocketsHandler);
 
             const string expectedOperationName = "http.request";
