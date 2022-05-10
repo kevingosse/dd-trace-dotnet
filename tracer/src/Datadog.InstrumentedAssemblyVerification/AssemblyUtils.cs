@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using NuGet.Configuration;
+//using NuGet.Configuration;
 
 namespace Datadog.InstrumentedAssemblyVerification
 {
@@ -108,9 +108,9 @@ namespace Datadog.InstrumentedAssemblyVerification
 
         internal static Assembly GetAssemblyFromNugetFolder(string assemblyName, Version assemblyVersion, bool isNetCore)
         {
-            var settings = Settings.LoadDefaultSettings(null);
-            string nugetPackagesFolder = SettingsUtility.GetGlobalPackagesFolder(settings);
-
+            //var settings = Settings.LoadDefaultSettings(null);
+            //string nugetPackagesFolder = SettingsUtility.GetGlobalPackagesFolder(settings);
+            string nugetPackagesFolder = "revert and squash this change.";
             string assemblyFolder = Path.Combine(nugetPackagesFolder, assemblyName);
             if (Directory.Exists(assemblyFolder) == false)
             {
