@@ -41,6 +41,13 @@ namespace Datadog.Trace.Propagators
                     });
 #pragma warning restore SA1118 // Parameter should not span multiple lines
             }
+
+            var datadogTags = context.TraceContext?.Tags?.ToPropagationHeader() ?? context.DatadogTags;
+
+            if (datadogTags != null)
+            {
+                carrierSetter.Set(carrier, HttpHeaderNames.DatadogTags, datadogTags);
+            }
         }
 
         public bool TryExtract<TCarrier, TCarrierGetter>(TCarrier carrier, TCarrierGetter carrierGetter, out SpanContext? spanContext)
