@@ -72,6 +72,7 @@ namespace Datadog.InstrumentedAssemblyVerification
                 _isNetCore = AssemblyUtils.IsNetFramework(asm);
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
+
                 foreach (string method in _methods)
                 {
                     try
@@ -84,6 +85,7 @@ namespace Datadog.InstrumentedAssemblyVerification
                             _logger.Warn($"Type {typeName} not found in assembly {asm.FullName}");
                             continue;
                         }
+
                         Type copyType;
                         List<Type> genericTypeArguments = new List<Type>();
 
@@ -110,6 +112,7 @@ namespace Datadog.InstrumentedAssemblyVerification
                         {
                             foundedMbs = new[] { foundedMb };
                         }
+
                         foreach (MethodBase mb in foundedMbs)
                         {
                             try
@@ -170,8 +173,11 @@ namespace Datadog.InstrumentedAssemblyVerification
                             catch (FileNotFoundException ex)
                             {
                                 AddErrorIfNotNullOrEmpty(
-                                    HandleException(ex, mb.DeclaringType.FullName, mb.Name,
-                                                    "Assembly resolution failed. May occur if we try to prepare a method that is dependent on a module that was not loaded at runtime"));
+                                    HandleException(
+                                        ex,
+                                        mb.DeclaringType.FullName,
+                                        mb.Name,
+                                        "Assembly resolution failed. May occur if we try to prepare a method that is dependent on a module that was not loaded at runtime"));
                             }
                             catch (TypeLoadException ex)
                             {
@@ -201,12 +207,14 @@ namespace Datadog.InstrumentedAssemblyVerification
                 {
                     _logger.Info($"{nameof(PrepareMethodVerification)} finish without errors");
                 }
-
-                AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
             }
             catch (Exception e)
             {
                 _logger.Error($"{nameof(PrepareMethodVerification)} {asm?.FullName} finish with errors: {e}");
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
             }
             return _errors;
         }

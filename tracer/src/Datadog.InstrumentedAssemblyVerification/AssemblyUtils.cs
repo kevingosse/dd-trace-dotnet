@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-//using NuGet.Configuration;
 
 namespace Datadog.InstrumentedAssemblyVerification
 {
@@ -108,9 +107,12 @@ namespace Datadog.InstrumentedAssemblyVerification
 
         internal static Assembly GetAssemblyFromNugetFolder(string assemblyName, Version assemblyVersion, bool isNetCore)
         {
-            //var settings = Settings.LoadDefaultSettings(null);
-            //string nugetPackagesFolder = SettingsUtility.GetGlobalPackagesFolder(settings);
-            string nugetPackagesFolder = "revert and squash this change.";
+            string nugetPackagesFolder = GetNugetGlobalPackagesFolder();
+            if (nugetPackagesFolder == null)
+            {
+                return null;
+            }
+            
             string assemblyFolder = Path.Combine(nugetPackagesFolder, assemblyName);
             if (Directory.Exists(assemblyFolder) == false)
             {
@@ -164,6 +166,25 @@ namespace Datadog.InstrumentedAssemblyVerification
                 {
                     return Assembly.LoadFile(assemblyFile);
                 }
+            }
+            return null;
+        }
+
+        private static string GetNugetGlobalPackagesFolder()
+        {
+            var nugetPackages = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+            if (nugetPackages != null)
+            {
+                return nugetPackages;
+            }
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return Environment.ExpandEnvironmentVariables(@"%userprofile%\.nuget\packages");
+            }
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || 
+                RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return @"~/.nuget/packages";
             }
             return null;
         }
